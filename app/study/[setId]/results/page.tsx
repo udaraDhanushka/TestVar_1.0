@@ -1,15 +1,16 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { use, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, RotateCw } from 'lucide-react';
 
-export default function StudyResults({ params }: { params: { setId: string } }) {
+export default function StudyResults({ params }: { params: Promise<{ setId: string }>}) {
   const router = useRouter();
   const [results, setResults] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const {setId} = use(params);
 
   useEffect(() => {
     const fetchResults = async () => {
@@ -29,7 +30,7 @@ export default function StudyResults({ params }: { params: { setId: string } }) 
     };
 
     fetchResults();
-  }, [params.setId]);
+  }, [setId]);
 
   if (isLoading) {
     return <div>Loading results...</div>;
@@ -53,15 +54,19 @@ export default function StudyResults({ params }: { params: { setId: string } }) 
             </div>
             <div className="p-4 bg-gray-50 rounded-lg">
               <p className="text-sm text-gray-600">Average Rating</p>
-              <p className="text-2xl font-bold">
-                {Object.values(results?.ratings || {}).reduce((a: number, b: number) => a + b, 0) /
-                  (Object.values(results?.ratings || {}).length || 1)}
+              <p className='text-2xl font-bold'>
+                {(() => {
+                  const ratings = Object.values(results?.ratings || {}) as number[];
+                  const total = ratings.reduce((a, b) => a + b, 0);
+                  const average = total / (ratings.length || 1);
+                  return average.toFixed(2);
+                })()}
               </p>
             </div>
           </div>
 
           <div className="flex justify-center space-x-4">
-            <Button onClick={() => router.push(`/study/${params.setId}`)}>
+            <Button onClick={() => router.push(`/study/${setId}`)}>
               <RotateCw className="h-4 w-4 mr-2" />
               Study Again
             </Button>

@@ -32,6 +32,7 @@ export interface FlashcardSet {
 }
 
 export interface Flashcard {
+  hiddenCards: any;
   // [x: string]: any;
   id: number;
   question: string;

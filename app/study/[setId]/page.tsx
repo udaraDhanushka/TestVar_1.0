@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { use, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { StudySession } from '@/components/study/study-session';
 import { Flashcard, FlashcardSet } from '@/lib/types';
@@ -8,17 +8,18 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ArrowLeft } from 'lucide-react';
 
-export default function StudyPage({ params }: { params: { setId: string } }) {
+export default function StudyPage({ params }: { params: Promise<{ setId: string }> }) {
   const router = useRouter();
   const [flashcards, setFlashcards] = useState<Flashcard[]>([]);
   const [flashcardSet, setFlashcardSet] = useState<FlashcardSet>();
   const [sessionId, setSessionId] = useState<number>();
   const [isLoading, setIsLoading] = useState(true);
+  const {setId} = use(params)
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`/api/flashcard-sets/${params.setId}`);
+        const response = await fetch(`/api/flashcard-sets/${setId}`);
         if (response.ok) {
           const data = await response.json();
           setFlashcardSet(data);
@@ -34,7 +35,7 @@ export default function StudyPage({ params }: { params: { setId: string } }) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               result: {
-                flashcardSetId: params.setId,
+                flashcardSetId: setId,
                 status: 'started',
               },
             }),
@@ -53,7 +54,7 @@ export default function StudyPage({ params }: { params: { setId: string } }) {
     };
 
     fetchData();
-  }, [params.setId]);
+  }, [setId]);
 
   const handleStudyComplete = async (results: any) => {
     if (sessionId) {
@@ -70,7 +71,7 @@ export default function StudyPage({ params }: { params: { setId: string } }) {
           }),
         });
 
-        router.push(`/study/${params.setId}/results`);
+        router.push(`/study/${setId}/results`);
       } catch (error) {
         console.error('Failed to update session:', error);
       }
@@ -86,7 +87,7 @@ export default function StudyPage({ params }: { params: { setId: string } }) {
       <Card className="p-6 max-w-xl mx-auto mt-8">
         <h2 className="text-xl font-semibold mb-4">No flashcards available</h2>
         <p className="text-gray-600 mb-4">
-          This set doesn't have any flashcards yet. Add some flashcards to start studying.
+          This set doesn&apos;t have any flashcards yet. Add some flashcards to start studying.
         </p>
         <Button onClick={() => router.back()}>
           <ArrowLeft className="h-4 w-4 mr-2" />
