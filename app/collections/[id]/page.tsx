@@ -16,15 +16,16 @@ import {
 import { Collection, FlashcardSet } from '@/lib/types';
 import { NewFlashcardSetForm } from '@/components/flashcards/new-flashcard-set-form';
 
-export default function CollectionPage({ params }: { params: { id: string } }) {
+export default function CollectionPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
   const [collection, setCollection] = useState<Collection & { flashcardSets: FlashcardSet[] }>();
   const [isLoading, setIsLoading] = useState(true);
+  const {id} = use(params);
 
 
   const fetchCollection = useCallback ( async () => {
     try {
-      const response = await fetch(`/api/collections/${params.id}`);
+      const response = await fetch(`/api/collections/${id}`);
       if (response.ok) {
         const data = await response.json();
         setCollection(data);
@@ -34,7 +35,7 @@ export default function CollectionPage({ params }: { params: { id: string } }) {
     } finally {
       setIsLoading(false);
     }
-  }, [params.id]);
+  }, [id]);
 
   useEffect(() => {
     fetchCollection();
@@ -46,7 +47,7 @@ export default function CollectionPage({ params }: { params: { id: string } }) {
     }
 
     try {
-      const response = await fetch(`/api/collections/${params.id}`, {
+      const response = await fetch(`/api/collections/${id}`, {
         method: 'DELETE',
       });
 
@@ -86,7 +87,7 @@ export default function CollectionPage({ params }: { params: { id: string } }) {
                 <DialogTitle>Create New Flashcard Set</DialogTitle>
               </DialogHeader>
               <NewFlashcardSetForm
-                collectionId={parseInt(params.id)}
+                collectionId={parseInt(id)}
                 onSuccess={fetchCollection}
               />
             </DialogContent>
@@ -120,4 +121,8 @@ export default function CollectionPage({ params }: { params: { id: string } }) {
       </div>
     </div>
   );
+}
+
+function use(params: Promise<{ id: string; }>): { id: any; } {
+  throw new Error('Function not implemented.');
 }

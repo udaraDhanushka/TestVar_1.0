@@ -4,14 +4,15 @@ import { useEffect, useState } from 'react';
 import { FlashcardSetForm } from '@/components/flashcard-sets/flashcard-set-form';
 import { FlashcardSet } from '@/lib/types';
 
-export default function EditFlashcardSet({ params }: { params: { id: string } }) {
+export default function EditFlashcardSet({ params }: { params: Promise<{ id: string }> }) {
   const [flashcardSet, setFlashcardSet] = useState<FlashcardSet | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const {id} = use(params);
 
   useEffect(() => {
     async function fetchFlashcardSet() {
       try {
-        const response = await fetch(`/api/flashcard-sets/${params.id}`);
+        const response = await fetch(`/api/flashcard-sets/${id}`);
         if (response.ok) {
           const data = await response.json();
           setFlashcardSet(data);
@@ -24,7 +25,7 @@ export default function EditFlashcardSet({ params }: { params: { id: string } })
     }
 
     fetchFlashcardSet();
-  }, [params.id]);
+  }, [id]);
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -46,4 +47,8 @@ export default function EditFlashcardSet({ params }: { params: { id: string } })
       />
     </div>
   );
+}
+
+function use(params: Promise<{ id: string; }>): { id: any; } {
+  throw new Error('Function not implemented.');
 }

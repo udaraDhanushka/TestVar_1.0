@@ -16,17 +16,18 @@ import {
 } from '@/components/ui/dialog';
 import { NewFlashcardForm } from '@/components/flashcards/new-flashcard-form';
 
-export default function FlashcardSetDetail({ params }: { params: { id: string } }) {
+export default function FlashcardSetDetail({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
   const [flashcardSet, setFlashcardSet] = useState<FlashcardSet & { flashcards: Flashcard[] } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const {id} = use(params);
 
   const fetchFlashcardSet = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await fetch(`/api/flashcard-sets/${params.id}`);
+      const response = await fetch(`/api/flashcard-sets/${id}`);
       if (response.ok) {
         const data = await response.json();
         setFlashcardSet(data);
@@ -39,7 +40,7 @@ export default function FlashcardSetDetail({ params }: { params: { id: string } 
     } finally {
       setIsLoading(false);
     }
-  }, [params.id]);
+  }, [id]);
 
   useEffect(() => {
     fetchFlashcardSet();
@@ -94,7 +95,7 @@ export default function FlashcardSetDetail({ params }: { params: { id: string } 
               <DialogTitle>Create New Flashcard</DialogTitle>
             </DialogHeader>
             <NewFlashcardForm
-              flashcardSetId={parseInt(params.id, 10)}
+              flashcardSetId={parseInt(id, 10)}
               onSuccess={fetchFlashcardSet}
             />
           </DialogContent>
@@ -115,3 +116,7 @@ export default function FlashcardSetDetail({ params }: { params: { id: string } 
     </div>
   );
 }
+function use(params: Promise<{ id: string; }>): { id: any; } {
+  throw new Error('Function not implemented.');
+}
+
