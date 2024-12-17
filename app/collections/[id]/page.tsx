@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { use, useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Plus, Edit, Trash2 } from 'lucide-react';
@@ -121,8 +121,4 @@ export default function CollectionPage({ params }: { params: Promise<{ id: strin
       </div>
     </div>
   );
-}
-
-function use(params: Promise<{ id: string; }>): { id: any; } {
-  throw new Error('Function not implemented.');
 }

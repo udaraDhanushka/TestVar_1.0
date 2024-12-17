@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { use, useEffect, useState } from 'react';
 import { FlashcardSetForm } from '@/components/flashcard-sets/flashcard-set-form';
 import { FlashcardSet } from '@/lib/types';
 
@@ -47,8 +47,4 @@ export default function EditFlashcardSet({ params }: { params: Promise<{ id: str
       />
     </div>
   );
-}
-
-function use(params: Promise<{ id: string; }>): { id: any; } {
-  throw new Error('Function not implemented.');
 }

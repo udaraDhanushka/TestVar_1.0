@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { use, useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { FlashcardSet, Flashcard } from '@/lib/types';
 import { Button } from '@/components/ui/button';
@@ -93,8 +93,4 @@ export default function FlashcardSetDetail({ params }: { params: Promise<{ id: s
       )}
     </div>
   );
-}
-
-function use(params: Promise<{ id: string; }>): { id: any; } {
-  throw new Error('Function not implemented.');
 }
