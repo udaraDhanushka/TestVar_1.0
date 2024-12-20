@@ -6,7 +6,7 @@ import { FlashcardSet, Flashcard } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ArrowLeft, Plus } from 'lucide-react';
-import { FlashcardView } from '@/components/flashcards/flashcard-view';
+// import { FlashcardView } from '@/components/flashcards/flashcard-view';
 import {
   Dialog,
   DialogContent,
@@ -15,6 +15,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { NewFlashcardForm } from '@/components/flashcards/new-flashcard-form';
+import FlashcardStack from '@/components/flashcards/FlashcardStack';
 
 export default function FlashcardSetDetail({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
@@ -109,7 +110,7 @@ export default function FlashcardSetDetail({ params }: { params: Promise<{ id: s
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {flashcardSet.flashcards?.map((flashcard: Flashcard) => (
-            <FlashcardView key={flashcard.id} flashcard={flashcard} />
+            <FlashcardStack key={flashcard.id} flashcards={flashcardSet.flashcards}  />
           ))}
         </div>
       )}
