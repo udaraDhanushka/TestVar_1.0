@@ -12,9 +12,19 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const userId = parseInt(params.id, 10);
+    if(isNaN(userId)){
+      return NextResponse.json({error: 'Invalid user id format'}, {status: 400});
+    }
+
+    const flashcardSetId = parseInt(params.id, 10);
+    if(isNaN(flashcardSetId)){
+      return NextResponse.json({error: 'Invalid ID format'}, {status: 400});
+    }
+
     const flashcardSet = await flashcardSetService.getFlashcardSetById(
-      parseInt(params.id),
-      user.id
+      flashcardSetId,
+      userId
     );
 
     if (!flashcardSet) {
@@ -38,10 +48,20 @@ export async function PUT(
     }
 
     const json = await request.json();
+    const userId = parseInt(params.id, 10);
+    if(isNaN(userId)){
+      return NextResponse.json({error: 'Invalid user id format'}, {status: 400});
+    }
+
+    const flashcardSetId = parseInt(params.id, 10);
+    if(isNaN(flashcardSetId)){
+      return NextResponse.json({error: 'Invalid ID format'}, {status: 400});
+    }
+
     const flashcardSet = await flashcardSetService.updateFlashcardSet(
       parseInt(params.id),
       json,
-      user.id
+      userId
     );
 
     return NextResponse.json(flashcardSet);
@@ -60,7 +80,17 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    await flashcardSetService.deleteFlashcardSet(parseInt(params.id), user.id);
+    const userId = parseInt(params.id, 10);
+    if(isNaN(userId)){
+      return NextResponse.json({error: 'Invalid user id format'}, {status: 400});
+    }
+
+    const flashcardSetId = parseInt(params.id, 10);
+    if(isNaN(flashcardSetId)){
+      return NextResponse.json({error: 'Invalid ID format'}, {status: 400});
+    }
+
+    await flashcardSetService.deleteFlashcardSet(parseInt(params.id), userId);
     return NextResponse.json({ success: true });
   } catch (error) {
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });

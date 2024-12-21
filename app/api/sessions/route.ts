@@ -9,6 +9,11 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const userId = parseInt(user.id, 10);
+    if (isNaN(userId)) {
+      return NextResponse.json({ error: 'Invalid user ID format' }, { status: 400 });
+    }
+
     let json;
     try {
       json = await request.json();
@@ -22,7 +27,7 @@ export async function POST(request: Request) {
 
     const session = await prisma.session.create({
       data: {
-        userId: user.id,
+        userId: userId, 
         startTime: new Date(),
         result: json.result,
       },
@@ -40,6 +45,11 @@ export async function PUT(request: Request) {
     const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const userId = parseInt(user.id, 10);
+    if (isNaN(userId)) {
+      return NextResponse.json({ error: 'Invalid user ID format' }, { status: 400 });
     }
 
     let json;
@@ -79,8 +89,14 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+
+    const userId = parseInt(user.id, 10);
+    if (isNaN(userId)) {
+      return NextResponse.json({ error: 'Invalid user ID format' }, { status: 400 });
+    }
+
     const sessions = await prisma.session.findMany({
-      where: { userId: user.id },
+      where: { userId: userId },
       orderBy: { startTime: 'desc' },
     });
 
