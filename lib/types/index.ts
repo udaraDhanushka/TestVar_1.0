@@ -42,6 +42,12 @@ export interface Flashcard {
   flashcardSetId: number;
   createdBy: number;
   createdAt: Date;
+  ratings: number;
+}
+
+export interface CompletionStats {
+  gotIt: number;
+  knewIt: number;
 }
 
 export interface Rating {
