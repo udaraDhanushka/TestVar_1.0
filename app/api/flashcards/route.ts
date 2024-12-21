@@ -9,9 +9,10 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const userId = parseInt(user.id, 10);
     const flashcards = await prisma.flashcard.findMany({
       where: {
-        createdBy: user.id,
+        createdBy: userId,
       },
       include: {
         ratings: true,
@@ -33,6 +34,7 @@ export async function POST(request: Request) {
     }
 
     const json = await request.json();
+    const userId = parseInt(user.id, 10);
     const flashcard = await prisma.flashcard.create({
       data: {
         question: json.question,
@@ -40,7 +42,7 @@ export async function POST(request: Request) {
         tags: json.tags,
         publishedStatus: json.publishedStatus,
         flashcardSetId: json.flashcardSetId,
-        createdBy: user.id,
+        createdBy: userId,
       },
     });
 

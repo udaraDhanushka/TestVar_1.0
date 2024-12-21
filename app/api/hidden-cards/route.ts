@@ -9,10 +9,15 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const userId = parseInt(user.id, 10);
+    if (isNaN(userId)) {
+      return NextResponse.json({ error: 'Invalid user ID format' }, { status: 400 });
+    }
+
     const json = await request.json();
     const hiddenCard = await prisma.hiddenFlashcard.create({
       data: {
-        userId: user.id,
+        userId: userId,
         flashcardId: json.flashcardId,
       },
     });
@@ -37,9 +42,14 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ error: 'Flashcard ID is required' }, { status: 400 });
     }
 
+    const userId = parseInt(user.id, 10);
+    if (isNaN(userId)) {
+      return NextResponse.json({ error: 'Invalid user ID format' }, { status: 400 });
+    }
+
     await prisma.hiddenFlashcard.deleteMany({
       where: {
-        userId: user.id,
+        userId: userId,
         flashcardId: parseInt(flashcardId),
       },
     });
@@ -57,9 +67,14 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const userId = parseInt(user.id, 10);
+    if (isNaN(userId)) {
+      return NextResponse.json({ error: 'Invalid user ID format' }, { status: 400 });
+    }
+
     const hiddenCards = await prisma.hiddenFlashcard.findMany({
       where: {
-        userId: user.id,
+        userId: userId,
       },
       include: {
         flashcard: true,

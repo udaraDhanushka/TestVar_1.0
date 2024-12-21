@@ -12,9 +12,14 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const userId = parseInt(user.id, 10);
+    if (isNaN(userId)) {
+      return NextResponse.json({ error: 'Invalid user ID format' }, { status: 400 });
+    }
+
     const flashcard = await flashcardService.getFlashcardById(
       parseInt(params.id),
-      user.id
+      userId
     );
 
     if (!flashcard) {
@@ -38,10 +43,16 @@ export async function PUT(
     }
 
     const json = await request.json();
+
+    const userId = parseInt(user.id, 10);
+    if (isNaN(userId)) {
+      return NextResponse.json({ error: 'Invalid user ID format' }, { status: 400 });
+    }
+
     const flashcard = await flashcardService.updateFlashcard(
       parseInt(params.id),
       json,
-      user.id
+      userId
     );
 
     return NextResponse.json(flashcard);
@@ -60,7 +71,12 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    await flashcardService.deleteFlashcard(parseInt(params.id), user.id);
+    const userId = parseInt(user.id, 10);
+    if (isNaN(userId)) {
+      return NextResponse.json({ error: 'Invalid user ID format' }, { status: 400 });
+    }
+
+    await flashcardService.deleteFlashcard(parseInt(params.id), userId);
     return NextResponse.json({ success: true });
   } catch (error) {
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });

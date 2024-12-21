@@ -9,11 +9,16 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const userId = parseInt(user.id, 10);
+    if (isNaN(userId)) {
+      return NextResponse.json({ error: 'Invalid user ID format' }, { status: 400 });
+    }
+
     const json = await request.json();
     const rating = await prisma.rating.upsert({
       where: {
         userId_flashcardId: {
-          userId: user.id,
+          userId: userId,
           flashcardId: json.flashcardId,
         },
       },
@@ -21,7 +26,7 @@ export async function POST(request: Request) {
         rating: json.rating,
       },
       create: {
-        userId: user.id,
+        userId: userId,
         flashcardId: json.flashcardId,
         rating: json.rating,
       },
@@ -40,12 +45,17 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const userId = parseInt(user.id, 10);
+    if (isNaN(userId)) {
+      return NextResponse.json({ error: 'Invalid user ID format' }, { status: 400 });
+    }
+
     const { searchParams } = new URL(request.url);
     const flashcardId = searchParams.get('flashcardId');
 
     const ratings = await prisma.rating.findMany({
       where: {
-        userId: user.id,
+        userId: userId,
         ...(flashcardId && { flashcardId: parseInt(flashcardId) }),
       },
       include: {

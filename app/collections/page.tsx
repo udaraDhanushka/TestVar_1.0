@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CollectionCard } from '@/components/collections/collection-card';
-import { Collection, FlashcardSet  } from '@/lib/types';
 
 export default async function Collections() {
   const user = await getCurrentUser();
@@ -13,8 +12,7 @@ export default async function Collections() {
     return null;
   }
 
-  const userId = user.id;
-
+  const userId = parseInt(user.id, 10);
   const collections = await prisma.collection.findMany({
     where: {
       createdBy: userId,
@@ -22,7 +20,12 @@ export default async function Collections() {
     include: {
       flashcardSets: {
         include: {
-          flashcards: true,
+          flashcards: {
+            include: {
+              ratings: true,
+              hiddenCards: true,
+            }
+          }
         },
       },
     },
@@ -34,7 +37,11 @@ export default async function Collections() {
     description: collection.description ?? 'No description',
     flashcardSets: collection.flashcardSets.map((set) => ({
       ...set,
-      flashcards: set.flashcards || [],
+      flashcards: set.flashcards.map((flashcard)=>({
+        ...flashcard,
+      hiddenCards: flashcard.hiddenCards ?? [],
+      ratings: flashcard.ratings ?? 0,
+      })),
     })),
   }));
 

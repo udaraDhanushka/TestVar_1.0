@@ -9,9 +9,10 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const userId = parseInt(user.id, 10);
     const collections = await prisma.collection.findMany({
       where: {
-        createdBy: user.id,
+        createdBy: userId,
       },
       include: {
         flashcardSets: true,
@@ -32,11 +33,12 @@ export async function POST(request: Request) {
     }
 
     const json = await request.json();
+    const userId = parseInt(user.id, 10);
     const collection = await prisma.collection.create({
       data: {
         name: json.name,
         description: json.description,
-        createdBy: user.id,
+        createdBy: userId,
       },
     });
 

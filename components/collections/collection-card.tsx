@@ -11,17 +11,17 @@ interface CollectionCardProps {
 }
 
 export function CollectionCard({ collection }: CollectionCardProps) {
-  const totalCards = collection.flashcardSets.reduce(
+  const totalCards = (collection.flashcardSets || []).reduce(
     (acc, set) => acc + (set.flashcards?.length || 0),
     0
   );
 
   return (
-    <Link href={`/collections/${collection.id}`}>
+    <Link href={`/collections/${collection.id}`} aria-label={`View collection: ${collection.name}`}>
       <Card className="p-6 hover:shadow-lg transition-shadow">
         <h2 className="text-xl font-semibold mb-2">{collection.name}</h2>
         <p className="text-gray-500 text-sm mb-4">
-          {collection.description || 'No description available'}
+          {collection.description ? collection.description : 'No description available'}
         </p>
         <div className="flex justify-between text-sm text-gray-500">
           <span>{collection.flashcardSets.length} sets</span>

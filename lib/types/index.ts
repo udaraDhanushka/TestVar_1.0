@@ -1,3 +1,5 @@
+import { HiddenFlashcard } from "@prisma/client";
+
 export interface User {
   id: number;
   first_name: string;
@@ -11,7 +13,6 @@ export interface User {
 export interface Collection {
   id: number;
   name: string;
-  // description?: string;
   description?: string | null;
   createdBy: number;
   createdAt: Date;
@@ -20,7 +21,6 @@ export interface Collection {
 }
 
 export interface FlashcardSet {
-  // flashcards: any;
   id: number;
   name: string;
   description?: string | null;
@@ -32,8 +32,6 @@ export interface FlashcardSet {
 }
 
 export interface Flashcard {
-  hiddenCards: any;
-  // [x: string]: any;
   id: number;
   question: string;
   answer: string;
@@ -42,7 +40,8 @@ export interface Flashcard {
   flashcardSetId: number;
   createdBy: number;
   createdAt: Date;
-  ratings: number;
+  ratings: Rating[];
+  hiddenCards: HiddenFlashcard[];
 }
 
 export interface CompletionStats {

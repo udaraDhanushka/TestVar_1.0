@@ -12,10 +12,11 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const userId = parseInt(user.id, 10);
     const collection = await prisma.collection.findFirst({
       where: {
         id: parseInt(params.id),
-        createdBy: user.id,
+        createdBy: userId,
       },
       include: {
         flashcardSets: true,
