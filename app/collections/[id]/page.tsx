@@ -1,6 +1,6 @@
 'use client';
 
-import { use, useCallback, useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Plus, Edit, Trash2 } from 'lucide-react';
@@ -18,12 +18,20 @@ import { NewFlashcardSetForm } from '@/components/flashcards/new-flashcard-set-f
 
 export default function CollectionPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
-  const [collection, setCollection] = useState<Collection & { flashcardSets: FlashcardSet[] }>();
+  const [collection, setCollection] = useState<Collection & { flashcardSets: FlashcardSet[] } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const {id} = use(params);
+  const [id, setId] = useState<string | null>(null);
 
+  useEffect(() => {
+    const resolveParams = async () => {
+      const resolvedParams = await params;
+      setId(resolvedParams.id);
+    };
+    resolveParams();
+  }, [params]);
 
-  const fetchCollection = useCallback ( async () => {
+  const fetchCollection = useCallback(async () => {
+    if (!id) return;
     try {
       const response = await fetch(`/api/collections/${id}`);
       if (response.ok) {
@@ -86,10 +94,13 @@ export default function CollectionPage({ params }: { params: Promise<{ id: strin
               <DialogHeader>
                 <DialogTitle>Create New Flashcard Set</DialogTitle>
               </DialogHeader>
-              <NewFlashcardSetForm
-                collectionId={parseInt(id)}
-                onSuccess={fetchCollection}
-              />
+
+              { id && (
+                <NewFlashcardSetForm
+                  collectionId={parseInt(id)}
+                  onSuccess={fetchCollection}
+                />
+              )}
             </DialogContent>
           </Dialog>
           <Button variant="outline" onClick={handleDelete}>
