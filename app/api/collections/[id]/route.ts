@@ -7,6 +7,9 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
+
+    const {id} = await params;
+
     const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -15,7 +18,7 @@ export async function GET(
     const userId = parseInt(user.id, 10);
     const collection = await prisma.collection.findFirst({
       where: {
-        id: parseInt(params.id),
+        id: parseInt(id),
         createdBy: userId,
       },
       include: {
@@ -38,6 +41,8 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
+    const { id } = await params;
+
     const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -46,7 +51,7 @@ export async function PUT(
     const json = await request.json();
     const collection = await prisma.collection.update({
       where: {
-        id: parseInt(params.id),
+        id: parseInt(id),
       },
       data: {
         name: json.name,
@@ -65,6 +70,8 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
+    const { id } = await params;
+
     const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -72,7 +79,7 @@ export async function DELETE(
 
     await prisma.collection.delete({
       where: {
-        id: parseInt(params.id),
+        id: parseInt(id),
       },
     });
 

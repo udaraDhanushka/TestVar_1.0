@@ -7,19 +7,21 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
+    const { id } = await params;
+
     const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const userId = parseInt(params.id, 10);
-    if(isNaN(userId)){
-      return NextResponse.json({error: 'Invalid user id format'}, {status: 400});
+    const flashcardSetId = parseInt(id, 10);
+    if (isNaN(flashcardSetId)) {
+      return NextResponse.json({ error: 'Invalid ID format' }, { status: 400 });
     }
 
-    const flashcardSetId = parseInt(params.id, 10);
-    if(isNaN(flashcardSetId)){
-      return NextResponse.json({error: 'Invalid ID format'}, {status: 400});
+    const userId = parseInt(user.id, 10);
+    if (isNaN(userId)) {
+      return NextResponse.json({ error: 'Invalid user ID format' }, { status: 400 });
     }
 
     const flashcardSet = await flashcardSetService.getFlashcardSetById(
@@ -33,6 +35,7 @@ export async function GET(
 
     return NextResponse.json(flashcardSet);
   } catch (error) {
+    console.error('Error in GET /api/flashcard-sets/[id]:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
@@ -42,30 +45,34 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
+    const { id } = await params;
+
     const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const json = await request.json();
-    const userId = parseInt(params.id, 10);
-    if(isNaN(userId)){
-      return NextResponse.json({error: 'Invalid user id format'}, {status: 400});
+
+    const flashcardSetId = parseInt(id, 10);
+    if (isNaN(flashcardSetId)) {
+      return NextResponse.json({ error: 'Invalid ID format' }, { status: 400 });
     }
 
-    const flashcardSetId = parseInt(params.id, 10);
-    if(isNaN(flashcardSetId)){
-      return NextResponse.json({error: 'Invalid ID format'}, {status: 400});
+    const userId = parseInt(user.id, 10);
+    if (isNaN(userId)) {
+      return NextResponse.json({ error: 'Invalid user ID format' }, { status: 400 });
     }
 
     const flashcardSet = await flashcardSetService.updateFlashcardSet(
-      parseInt(params.id),
+      flashcardSetId,
       json,
       userId
     );
 
     return NextResponse.json(flashcardSet);
   } catch (error) {
+    console.error('Error in PUT /api/flashcard-sets/[id]:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
@@ -75,24 +82,27 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
+    const { id } = await params;
+
     const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const userId = parseInt(params.id, 10);
-    if(isNaN(userId)){
-      return NextResponse.json({error: 'Invalid user id format'}, {status: 400});
+    const flashcardSetId = parseInt(id, 10);
+    if (isNaN(flashcardSetId)) {
+      return NextResponse.json({ error: 'Invalid ID format' }, { status: 400 });
     }
 
-    const flashcardSetId = parseInt(params.id, 10);
-    if(isNaN(flashcardSetId)){
-      return NextResponse.json({error: 'Invalid ID format'}, {status: 400});
+    const userId = parseInt(user.id, 10);
+    if (isNaN(userId)) {
+      return NextResponse.json({ error: 'Invalid user ID format' }, { status: 400 });
     }
 
-    await flashcardSetService.deleteFlashcardSet(parseInt(params.id), userId);
+    await flashcardSetService.deleteFlashcardSet(flashcardSetId, userId);
     return NextResponse.json({ success: true });
   } catch (error) {
+    console.error('Error in DELETE /api/flashcard-sets/[id]:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
