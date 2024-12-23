@@ -8,12 +8,14 @@ declare module 'next-auth' {
   interface User {
     id: string;
     role: string;
+    name: string;
   }
 
   interface Session {
     user?: {
       id: string;
       role: string;
+      name: string;
     };
   }
 }
@@ -61,6 +63,7 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.role = user.role;
         token.id = user.id;
+        token.name = user.name;
       }
       return token;
     },
@@ -70,6 +73,7 @@ export const authOptions: NextAuthOptions = {
           ...session.user,
           id: token.id as string,
           role: token.role as string,
+          name: token.name as string,
         }
       }
       return session;
