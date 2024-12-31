@@ -6,7 +6,6 @@ import { FlashcardSet, Flashcard } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ArrowLeft, Plus } from 'lucide-react';
-// import { FlashcardView } from '@/components/flashcards/flashcard-view';
 import {
   Dialog,
   DialogContent,

@@ -7,27 +7,34 @@ import { SystemSettings } from '@/components/admin/dashboard/system-settings';
 
 export default function AdminDashboard() {
   return (
-    <div className="max-w-7xl mx-auto py-8 px-4">
-      <h1 className="text-3xl font-bold mb-8">Admin Dashboard</h1>
+    <div className="min-h-screen bg-background">
+      <div className="max-w-7xl mx-auto py-8 px-4">
+        <header className="mb-8">
+          <h1 className="text-4xl font-bold">TestVar Admin</h1>
+          <p className="text-muted-foreground mt-2">
+            Manage your flashcard platform resources and monitor user activity
+          </p>
+        </header>
 
-      <div className="mb-8">
-        <StatsOverview />
+        <div className="mb-8">
+          <StatsOverview />
+        </div>
+
+        <Tabs defaultValue="activity" className="space-y-4">
+          <TabsList>
+            <TabsTrigger value="activity">User Activity</TabsTrigger>
+            <TabsTrigger value="settings">System Settings</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="activity" className="space-y-4">
+            <ActivityLog />
+          </TabsContent>
+
+          <TabsContent value="settings" className="space-y-4">
+            <SystemSettings />
+          </TabsContent>
+        </Tabs>
       </div>
-
-      <Tabs defaultValue="activity">
-        <TabsList className="mb-8">
-          <TabsTrigger value="activity">User Activity</TabsTrigger>
-          <TabsTrigger value="settings">System Settings</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="activity">
-          <ActivityLog />
-        </TabsContent>
-
-        <TabsContent value="settings">
-          <SystemSettings />
-        </TabsContent>
-      </Tabs>
     </div>
   );
 }
