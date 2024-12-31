@@ -59,7 +59,7 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
     }
 
-    if (!json.sessionId || !json.result || typeof json.result !== 'object') {
+    if (!json.sessionId || isNaN(json.sessionId) || !json.result || typeof json.result !== 'object') {
       return NextResponse.json({ error: 'Missing or invalid sessionId or result' }, { status: 400 });
     }
 
@@ -88,7 +88,6 @@ export async function GET(request: Request) {
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-
 
     const userId = parseInt(user.id, 10);
     if (isNaN(userId)) {

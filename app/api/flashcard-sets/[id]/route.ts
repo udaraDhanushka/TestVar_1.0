@@ -32,8 +32,8 @@ export async function GET(
     if (!flashcardSet) {
       return NextResponse.json({ error: 'Flashcard set not found' }, { status: 404 });
     }
-
     return NextResponse.json(flashcardSet);
+    
   } catch (error) {
     console.error('Error in GET /api/flashcard-sets/[id]:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
