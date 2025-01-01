@@ -1,14 +1,14 @@
 'use client';
 
-import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 
-export function DailyLimitControl({ value, onChange }: { 
-  value: number; 
+interface DailyLimitControlProps {
+  value: number;
   onChange: (value: number) => void;
-}) {
+}
+
+export function DailyLimitControl({ value, onChange }: DailyLimitControlProps) {
   return (
     <div className="space-y-2">
       <Label>Daily Flashcard Set Creation Limit</Label>

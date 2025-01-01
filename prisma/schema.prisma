@@ -8,19 +8,19 @@ datasource db {
 }
 
 model User {
-  id          Int               @id @default(autoincrement())
-  first_name  String
-  last_name   String
-  email       String            @unique
-  password    String
-  role        String // Example: 'student' or 'admin'
-  createdAt   DateTime          @default(now())
-  updatedAt   DateTime          @updatedAt
-  collections Collection[]
-  flashcards  Flashcard[]
-  ratings     Rating[]
-  sessions    Session[]
-  hiddenCards HiddenFlashcard[]
+  id           Int               @id @default(autoincrement())
+  first_name   String
+  last_name    String
+  email        String            @unique
+  password     String
+  role         String            //'student' or 'admin'
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  collections  Collection[]
+  flashcards   Flashcard[]
+  ratings      Rating[]
+  sessions     Session[]
+  hiddenCards  HiddenFlashcard[]
   FlashcardSet FlashcardSet[]
 }
 
@@ -46,6 +46,8 @@ model FlashcardSet {
   collection   Collection  @relation(fields: [collectionId], references: [id])
   creator      User        @relation(fields: [createdBy], references: [id])
   flashcards   Flashcard[]
+
+  Rating Rating[]
 }
 
 model Flashcard {
@@ -64,15 +66,17 @@ model Flashcard {
 }
 
 model Rating {
-  id          Int       @id @default(autoincrement())
-  userId      Int
-  flashcardId Int
-  rating      Int
-  createdAt   DateTime  @default(now())
-  user        User      @relation(fields: [userId], references: [id])
-  flashcard   Flashcard @relation(fields: [flashcardId], references: [id])
+  id             Int          @id @default(autoincrement())
+  userId         Int
+  flashcardSetId Int
+  rating         Int
+  feedback       String?
+  createdAt      DateTime     @default(now())
+  user           User         @relation(fields: [userId], references: [id])
+  flashcardSet   FlashcardSet @relation(fields: [flashcardSetId], references: [id])
+  Flashcard      Flashcard[]
 
-  @@unique([userId, flashcardId])
+  @@unique([userId, flashcardSetId])
 }
 
 model HiddenFlashcard {

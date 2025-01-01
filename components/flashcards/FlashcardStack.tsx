@@ -6,9 +6,10 @@ import ProgressIndicator from '../flashcards/ProgressIndicator';
 
 interface FlashcardStackProps {
   flashcards: Flashcard[];
+  flashcardSetId: number;
 }
 
-export default function FlashcardStack({ flashcards }: FlashcardStackProps) {
+export default function FlashcardStack({ flashcards, flashcardSetId  }: FlashcardStackProps) {
   const [currentCards, setCurrentCards] = useState<Flashcard[]>(flashcards);
   const [stats, setStats] = useState<CompletionStats>({
     gotIt: 0,
@@ -25,8 +26,32 @@ export default function FlashcardStack({ flashcards }: FlashcardStackProps) {
     setCurrentCards(prev => prev.slice(1));
   };
 
+  const handleRatingSubmit = async (rating: number) => {
+    try {
+      const response = await fetch('/api/ratings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          flashcardSetId,
+          rating,
+          feedback: '',
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to submit rating');
+      }
+
+      console.log('Rating Submitted:', rating);
+    } catch (error) {
+      console.error('Error submitting rating:', error);
+    }
+  };
+
   if (currentCards.length === 0) {
-    return <CompletionScreen stats={stats} />;
+    return <CompletionScreen stats={stats} onRatingSubmit={handleRatingSubmit}/>;
   }
 
   return (

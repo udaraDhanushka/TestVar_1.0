@@ -87,7 +87,7 @@ export default function FlashcardSetDetail({ params }: { params: Promise<{ id: s
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {flashcardSet.flashcards.map((flashcard: Flashcard) => (
-            <FlashcardStack key={flashcard.id} flashcards={flashcardSet.flashcards} />
+            <FlashcardStack flashcards={flashcardSet.flashcards} flashcardSetId={parseInt(id)} />
           ))}
         </div>
       )}
