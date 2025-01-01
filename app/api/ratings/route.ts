@@ -15,25 +15,37 @@ export async function POST(request: Request) {
     }
 
     const json = await request.json();
-    const rating = await prisma.rating.upsert({
+    const { flashcardSetId, rating, feedback } = json;
+
+    if (!flashcardSetId || typeof rating !== 'number') {
+      return NextResponse.json(
+        { error: 'Flashcard Set ID and rating are required.' },
+        { status: 400 }
+      );
+    }
+
+    const updatedRating = await prisma.rating.upsert({
       where: {
-        userId_flashcardId: {
-          userId: userId,
-          flashcardId: json.flashcardId,
+        userId_flashcardSetId: {
+          userId,
+          flashcardSetId,
         },
       },
       update: {
-        rating: json.rating,
+        rating,
+        feedback: feedback ?? null,
       },
       create: {
-        userId: userId,
-        flashcardId: json.flashcardId,
-        rating: json.rating,
+        userId,
+        flashcardSetId,
+        rating,
+        feedback: feedback ?? null,
       },
     });
 
-    return NextResponse.json(rating);
+    return NextResponse.json(updatedRating);
   } catch (error) {
+    console.error(error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
@@ -51,20 +63,21 @@ export async function GET(request: Request) {
     }
 
     const { searchParams } = new URL(request.url);
-    const flashcardId = searchParams.get('flashcardId');
+    const flashcardSetId = searchParams.get('flashcardSetId');
 
     const ratings = await prisma.rating.findMany({
       where: {
-        userId: userId,
-        ...(flashcardId && { flashcardId: parseInt(flashcardId) }),
+        userId,
+        ...(flashcardSetId && { flashcardSetId: parseInt(flashcardSetId, 10) }),
       },
       include: {
-        flashcard: true,
+        flashcardSet: true,
       },
     });
 
     return NextResponse.json(ratings);
   } catch (error) {
+    console.error(error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
