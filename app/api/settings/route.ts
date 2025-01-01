@@ -18,22 +18,20 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const json = await request.json();
+    const { key, value } = await request.json();
+    if (!key || value == null) {
+      return NextResponse.json({ error: 'Invalid input' }, { status: 400 });
+    }
+
     const setting = await prisma.setting.upsert({
-      where: {
-        settingKey: json.key,
-      },
-      update: {
-        settingValue: json.value,
-      },
-      create: {
-        settingKey: json.key,
-        settingValue: json.value,
-      },
+      where: { settingKey: key },
+      update: { settingValue: value.toString() },
+      create: { settingKey: key, settingValue: value.toString() },
     });
 
     return NextResponse.json(setting);
   } catch (error) {
+    console.error(error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
@@ -60,6 +58,7 @@ export async function DELETE(request: Request) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
+    console.error(error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
