@@ -2,22 +2,29 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { useCallback, useEffect, useState } from "react";
 
 export function ActivityLog() {
-  const activities = [
-    {
-      user: "John Doe",
-      action: "Created new flashcard set",
-      details: "Advanced Mathematics - Calculus",
-      timestamp: "2024-03-26 14:30",
-    },
-    {
-      user: "Jane Smith",
-      action: "Updated flashcard set",
-      details: "Spanish Vocabulary - Basics",
-      timestamp: "2024-03-26 14:25",
-    },
-  ];
+  const [activityLog, setActivityLog] = useState([])
+  const [loading, setLoading] = useState(false)
+  const fetchActivityLog = useCallback(async () => {
+    setLoading(true)
+    try {
+      const response = await fetch(`/api/admin/activity-log`);
+      if (response.ok) {
+        const data = await response.json();
+        setActivityLog(data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch flashcard set:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchActivityLog();
+  }, [fetchActivityLog]);
 
   return (
     <Card>
@@ -30,17 +37,17 @@ export function ActivityLog() {
             <TableRow>
               <TableHead>User</TableHead>
               <TableHead>Action</TableHead>
-              <TableHead>Details</TableHead>
+              <TableHead>Action Type</TableHead>
               <TableHead>Timestamp</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {activities.map((activity, index) => (
+            {activityLog.map((activity, index) => (
               <TableRow key={index}>
-                <TableCell>{activity.user}</TableCell>
+                <TableCell>{`${activity.actor.first_name} ${activity.actor.last_name}`}</TableCell>
                 <TableCell>{activity.action}</TableCell>
-                <TableCell>{activity.details}</TableCell>
-                <TableCell>{activity.timestamp}</TableCell>
+                <TableCell>{activity.actionType}</TableCell>
+                <TableCell>{(new Date(activity.timestamp)).toDateString()}</TableCell>
               </TableRow>
             ))}
           </TableBody>

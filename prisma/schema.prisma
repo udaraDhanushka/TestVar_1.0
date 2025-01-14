@@ -13,7 +13,7 @@ model User {
   last_name    String
   email        String            @unique
   password     String
-  role         String            //'student' or 'admin'
+  role         String //'student' or 'admin'
   createdAt    DateTime          @default(now())
   updatedAt    DateTime          @updatedAt
   collections  Collection[]
@@ -22,6 +22,7 @@ model User {
   sessions     Session[]
   hiddenCards  HiddenFlashcard[]
   FlashcardSet FlashcardSet[]
+  ActivityLog  ActivityLog[]
 }
 
 model Collection {
@@ -103,4 +104,19 @@ model Setting {
   settingKey   String   @unique
   settingValue String
   updatedAt    DateTime @updatedAt
+}
+
+enum ActionTypes {
+  CREATE
+  UPDATE
+  DELETE
+}
+
+model ActivityLog {
+  id         Int         @id @default(autoincrement())
+  actor      User        @relation(fields: [actorId], references: [id])
+  action     String
+  actionType ActionTypes
+  actorId    Int
+  timestamp  DateTime    @default(now())
 }

@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/auth';
+import { logActivity } from '@/lib/services/logger.service';
+import { ActionTypes } from '@prisma/client';
 
 export async function GET() {
   try {
@@ -45,6 +47,12 @@ export async function POST(request: Request) {
         createdBy: userId,
       },
     });
+
+    await logActivity({
+      actorId: userId,
+      action: `Create new flash card | Flashcard set id -> ${json.flashcardSetId} Flashcard id -> ${flashcard.id}`,
+      actionType: ActionTypes.CREATE
+    })
 
     return NextResponse.json(flashcard);
   } catch (error) {
