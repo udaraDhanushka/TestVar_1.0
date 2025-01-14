@@ -20,9 +20,9 @@ export default function FlashcardSetDetail({ params }: { params: Promise<{ id: s
   const router = useRouter();
   const [flashcardSet, setFlashcardSet] = useState<FlashcardSet & { flashcards: Flashcard[] }>();
   const [isLoading, setIsLoading] = useState(true);
-  const {id} = use(params)
+  const { id } = use(params)
 
-  const fetchFlashcardSet = useCallback ( async () => {
+  const fetchFlashcardSet = useCallback(async () => {
     try {
       const response = await fetch(`/api/flashcard-sets/${id}`);
       if (response.ok) {
@@ -49,48 +49,47 @@ export default function FlashcardSetDetail({ params }: { params: Promise<{ id: s
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
-          <Button variant="ghost" onClick={() => router.back()}>
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back
-          </Button>
-          <div>
-            <h1 className="text-2xl font-bold">{flashcardSet.name}</h1>
-            <p className="text-gray-500">{flashcardSet.description}</p>
-          </div>
-        </div>
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button>
-              <Plus className="h-4 w-4 mr-2" />
-              Add Flashcard
+    <>
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <Button variant="ghost" onClick={() => router.back()}>
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back
             </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Create New Flashcard</DialogTitle>
-            </DialogHeader>
-            <NewFlashcardForm
-              flashcardSetId={parseInt(id)}
-              onSuccess={fetchFlashcardSet}
-            />
-          </DialogContent>
-        </Dialog>
+            <div>
+              <h1 className="text-2xl font-bold">{flashcardSet.name}</h1>
+              <p className="text-gray-500">{flashcardSet.description}</p>
+            </div>
+          </div>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button>
+                <Plus className="h-4 w-4 mr-2" />
+                Add Flashcard
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Create New Flashcard</DialogTitle>
+              </DialogHeader>
+              <NewFlashcardForm
+                flashcardSetId={parseInt(id)}
+                onSuccess={fetchFlashcardSet}
+              />
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
-
       {flashcardSet.flashcards.length === 0 ? (
         <Card className="p-6 text-center">
           <p className="text-gray-500">No flashcards yet. Add some to get started!</p>
         </Card>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {flashcardSet.flashcards.map((flashcard: Flashcard) => (
-            <FlashcardStack flashcards={flashcardSet.flashcards} flashcardSetId={parseInt(id)} />
-          ))}
+        <div className="grow flex flex-col justify-center align-center px-4 py-10">
+          <FlashcardStack flashcards={flashcardSet.flashcards} flashcardSetId={parseInt(id)} />
         </div>
       )}
-    </div>
+    </>
   );
 }
