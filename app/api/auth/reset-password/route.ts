@@ -26,6 +26,8 @@ export async function POST(request: Request) {
       },
     });
 
+    
+
     // TODO: Send password reset email with token
     // This would typically integrate with your email service
 

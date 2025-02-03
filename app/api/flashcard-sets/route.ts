@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/auth';
+import { logActivity } from '@/lib/services/logger.service';
+import { ActionTypes } from '@prisma/client';
 
 export async function GET() {
   try {
@@ -33,7 +35,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const userId = parseInt(user.id, 10); 
+    const userId = parseInt(user.id, 10);
     const json = await request.json();
     const flashcardSet = await prisma.flashcardSet.create({
       data: {
@@ -43,6 +45,13 @@ export async function POST(request: Request) {
         createdBy: userId,
       },
     });
+
+    await logActivity({
+      actorId: userId,
+      // action: `Create new collection -> collection id -> ${collection.id}`,
+      action: `Create new flash card set | Flashcard set id -> ${flashcardSet.id}`,
+      actionType: ActionTypes.CREATE
+    })
 
     return NextResponse.json(flashcardSet);
   } catch (error) {
