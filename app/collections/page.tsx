@@ -1,49 +1,36 @@
+'use client';
+
+import { useState, useEffect } from 'react';
 import { getCurrentUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
-import { Plus } from 'lucide-react';
+import { Plus, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { CollectionCard } from '@/components/collections/collection-card';
 
-export default async function Collections() {
-  const user = await getCurrentUser();
+export default function Collections() {
+  const [collections, setCollections] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [user, setUser] = useState(null);
 
-  if (!user) {
-    return null;
-  }
+  useEffect(() => {
+    const fetchCollections = async () => {
+      setLoading(true);
+      try {
+        const res = await fetch(`/api/search?q=${searchQuery}&type=collections`);
+        const data = await res.json();
+        setCollections(data.collections || []);
+      } catch (error) {
+        console.error('Error fetching collections:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const userId = parseInt(user.id, 10);
-  const collections = await prisma.collection.findMany({
-    where: {
-      createdBy: userId,
-    },
-    include: {
-      flashcardSets: {
-        include: {
-          flashcards: {
-            include: {
-              ratings: true,
-              hiddenCards: true,
-            }
-          }
-        },
-      },
-    },
-  });
-  console.log(user.id, typeof user.id);
-
-  const transformedCollections = collections.map((collection) => ({
-    ...collection,
-    description: collection.description ?? 'No description',
-    flashcardSets: collection.flashcardSets.map((set) => ({
-      ...set,
-      flashcards: set.flashcards.map((flashcard)=>({
-        ...flashcard,
-      hiddenCards: flashcard.hiddenCards ?? [],
-      ratings: flashcard.ratings ?? 0,
-      })),
-    })),
-  }));
+    fetchCollections();
+  }, [searchQuery]);
 
   return (
     <div className="space-y-6">
@@ -57,8 +44,25 @@ export default async function Collections() {
         </Link>
       </div>
 
+      {/* Search Bar */}
+      <div className="flex items-center space-x-2">
+        <Input
+          type="text"
+          placeholder="Search collections..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+        <Button variant="outline">
+          <Search className="h-4 w-4" />
+        </Button>
+      </div>
+
+      {/* Loading Indicator */}
+      {loading && <p>Loading...</p>}
+
+      {/* Collections Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {transformedCollections.map((collection) => (
+        {collections.map((collection) => (
           <CollectionCard key={collection.id} collection={collection} />
         ))}
       </div>
