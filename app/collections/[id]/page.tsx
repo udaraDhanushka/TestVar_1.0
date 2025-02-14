@@ -15,60 +15,85 @@ import {
 } from '@/components/ui/dialog';
 import { Collection, FlashcardSet } from '@/lib/types';
 import { NewFlashcardSetForm } from '@/components/flashcards/new-flashcard-set-form';
+import { AlertDescription } from '@/components/ui/alert';
+import { FlashcardSetForm } from '@/components/flashcard-sets/flashcard-set-form';
 
-export default function CollectionPage({ params }: { params: Promise<{ id: string }> }) {
+export default function CollectionPage({ params }: { params: { id: string } }) {
   const router = useRouter();
   const [collection, setCollection] = useState<Collection & { flashcardSets: FlashcardSet[] } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [id, setId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [showDeleteAlert, setShowDeleteAlert] = useState(false);
+  const [flashcardSetToDelete, setFlashcardSetToDelete] = useState<FlashcardSet | null>(null);
+  const [flashcardSetToEdit, setFlashcardSetToEdit] = useState<FlashcardSet | null>(null);
 
-  useEffect(() => {
-    const resolveParams = async () => {
-      const resolvedParams = await params;
-      setId(resolvedParams.id);
-    };
-    resolveParams();
-  }, [params]);
+  // Fetch collection data
 
-  const fetchCollection = useCallback(async () => {
-    if (!id) return;
+  const fetchCollection = useCallback(async (id: string) => {
     try {
       const response = await fetch(`/api/collections/${id}`);
-      if (response.ok) {
-        const data = await response.json();
-        setCollection(data);
+      if (!response.ok) {
+        throw new Error('Failed to fetch collection');
       }
+      const data = await response.json();
+      setCollection(data);
+      setError(null);
     } catch (error) {
       console.error('Failed to fetch collection:', error);
+      setError('Failed to load collection. Please try again later.');
     } finally {
       setIsLoading(false);
     }
-  }, [id]);
+  }, []);
+
+  // Resolve `params` and fetch collection data
 
   useEffect(() => {
-    fetchCollection();
-  }, [fetchCollection]);
+    const resolveParamsAndFetch = async () => {
+      try {
 
-  const handleDelete = async () => {
-    if (!window.confirm('Do you want to delete this collection?')) {
-      return;
-    }
+        // Await `params` to resolve the `id`
+
+        const resolvedParams = await params;
+        const id = resolvedParams.id;
+
+        // Fetch collection data
+
+        await fetchCollection(id);
+      } catch (error) {
+        console.error('Failed to resolve params or fetch collection:', error);
+        setError('Failed to load collection. Please try again later.');
+      }
+    };
+
+    resolveParamsAndFetch();
+  }, [params, fetchCollection]);
+
+  const handleDeleteFlashcardSet = async () => {
+    if (!flashcardSetToDelete) return;
 
     try {
-      const response = await fetch(`/api/collections/${id}`, {
+      const response = await fetch(`/api/flashcard-sets/${flashcardSetToDelete.id}`, {
         method: 'DELETE',
       });
 
       if (response.ok) {
-        router.push('/collections');
+        fetchCollection(params.id);
       }
     } catch (error) {
-      console.error('Failed to delete collection:', error);
+      console.error('Failed to delete flashcard set:', error);
+    } finally {
+      setShowDeleteAlert(false);
+      setFlashcardSetToDelete(null);
     }
   };
 
   if (isLoading) {
     return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>{error}</div>;
   }
 
   if (!collection) {
@@ -94,37 +119,87 @@ export default function CollectionPage({ params }: { params: Promise<{ id: strin
               <DialogHeader>
                 <DialogTitle>Create New Flashcard Set</DialogTitle>
               </DialogHeader>
-
-              { id && (
-                <NewFlashcardSetForm
-                  collectionId={parseInt(id)}
-                  onSuccess={fetchCollection}
-                />
-              )}
+              <NewFlashcardSetForm
+                collectionId={parseInt(params.id)}
+                onSuccess={() => fetchCollection(params.id)}
+              />
             </DialogContent>
           </Dialog>
-          <Button variant="outline" onClick={handleDelete}>
-            <Trash2 className="h-4 w-4 mr-2" />
-            Delete Collection
-          </Button>
         </div>
       </div>
 
+      <Dialog open={showDeleteAlert} onOpenChange={setShowDeleteAlert}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Flashcard Set</DialogTitle>
+          </DialogHeader>
+          <AlertDescription>
+            Are you sure you want to delete this flashcard set? This action cannot be undone.
+          </AlertDescription>
+          <div className="mt-4 flex justify-end space-x-2">
+            <Button variant="outline" onClick={() => setShowDeleteAlert(false)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={handleDeleteFlashcardSet}>
+              Delete
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {flashcardSetToEdit && (
+        <Dialog open={!!flashcardSetToEdit} onOpenChange={(open) => !open && setFlashcardSetToEdit(null)}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Edit Flashcard Set</DialogTitle>
+            </DialogHeader>
+            <FlashcardSetForm
+              flashcardSet={flashcardSetToEdit}
+              onSuccess={() => {
+                fetchCollection(params.id);
+                setFlashcardSetToEdit(null);
+              }}
+            />
+          </DialogContent>
+        </Dialog>
+      )}
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {(collection.flashcardSets || []).map((set) => (
-          <Link key={set.id} href={`/flashcard-sets/${set.id}`}>
-            <Card className="p-6 hover:shadow-lg transition-shadow">
+          <Link key={set.id} href={`/flashcard-sets/${set.id}`} passHref> {/* Wrap the card with Link */}
+            <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer"> {/* Add cursor-pointer for better UX */}
               <div className="flex justify-between items-start">
                 <h2 className="text-xl font-semibold">{set.name}</h2>
-                <Button variant="ghost" size="icon">
-                  <Edit className="h-4 w-4" />
-                </Button>
+                <div className="flex space-x-2">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={(e) => {
+                      e.preventDefault(); 
+                      setFlashcardSetToEdit(set);
+                    }}
+                  >
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-red-500 hover:text-red-600"
+                    onClick={(e) => {
+                      e.preventDefault(); 
+                      setFlashcardSetToDelete(set);
+                      setShowDeleteAlert(true);
+                    }}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
               <p className="text-gray-500 text-sm mt-2 mb-4">
                 {set.description || 'No description'}
               </p>
               <div className="text-sm text-gray-500">
-                Created {new Date(set.createdAt).toISOString().slice(0, 10)}
+                Created {new Date(set.createdAt || Date.now()).toISOString().slice(0, 10)}
               </div>
             </Card>
           </Link>
