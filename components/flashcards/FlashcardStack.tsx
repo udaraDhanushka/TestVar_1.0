@@ -9,7 +9,7 @@ interface FlashcardStackProps {
   flashcardSetId: number;
 }
 
-export default function FlashcardStack({ flashcards, flashcardSetId  }: FlashcardStackProps) {
+export default function FlashcardStack({ flashcards, flashcardSetId }: FlashcardStackProps) {
   const [currentCards, setCurrentCards] = useState<Flashcard[]>(flashcards);
   const [stats, setStats] = useState<CompletionStats>({
     gotIt: 0,
@@ -26,7 +26,7 @@ export default function FlashcardStack({ flashcards, flashcardSetId  }: Flashcar
     setCurrentCards(prev => prev.slice(1));
   };
 
-  const handleRatingSubmit = async (rating: number) => {
+  const handleRatingSubmit = async (rating: number, feedback?: string) => {
     try {
       const response = await fetch('/api/ratings', {
         method: 'POST',
@@ -36,7 +36,7 @@ export default function FlashcardStack({ flashcards, flashcardSetId  }: Flashcar
         body: JSON.stringify({
           flashcardSetId,
           rating,
-          feedback: '',
+          feedback: feedback || '',
         }),
       });
 
@@ -51,7 +51,7 @@ export default function FlashcardStack({ flashcards, flashcardSetId  }: Flashcar
   };
 
   if (currentCards.length === 0) {
-    return <CompletionScreen stats={stats} onRatingSubmit={handleRatingSubmit}/>;
+    return <CompletionScreen stats={stats} onRatingSubmit={handleRatingSubmit} />;
   }
 
   return (

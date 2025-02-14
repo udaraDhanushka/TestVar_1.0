@@ -51,7 +51,7 @@ export default function Collections() {
       console.error('Failed to delete collection:', error);
     } finally {
       setShowDeleteAlert(false);
-      setCollectionToDelete(null); 
+      setCollectionToDelete(null);
     }
   };
 

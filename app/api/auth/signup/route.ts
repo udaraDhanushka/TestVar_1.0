@@ -40,9 +40,9 @@ export async function POST(request: Request) {
 
     const { password: _, ...userWithoutPassword } = user;
     return NextResponse.json(userWithoutPassword);
-  } catch (error) {
+  } catch (error: any) {
     return NextResponse.json(
-      { error: 'Error creating user' },
+      { error: error.message || 'Error creating user' },
       { status: 500 }
     );
   }

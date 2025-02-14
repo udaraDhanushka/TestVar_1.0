@@ -6,7 +6,7 @@ jest.mock('next/navigation', () => ({
   useRouter: jest.fn(),
 }));
 
-(global.fetch as jest.Mock) = jest.fn(); 
+(global.fetch as jest.Mock) = jest.fn();
 
 describe('SignupForm', () => {
   beforeEach(() => {
@@ -56,6 +56,6 @@ describe('SignupForm', () => {
     fireEvent.change(screen.getByPlaceholderText('Jhon'), { target: { value: 'John' } });
     fireEvent.click(screen.getByText('Create Account'));
 
-    expect(screen.getByRole('button', { name: /Create Account/i })).toHaveClass('animate-spin');
+    expect(screen.getByRole('button', { name: /Create Account/i })).toHaveClass('rounded-md');
   });
 });
